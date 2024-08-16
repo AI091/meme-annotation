@@ -1,26 +1,32 @@
-import { createRouter, createWebHistory } from "vue-router";
-import AnnotationView from "@/views/AnnotationView.vue";
-import AuthView from "@/views/AuthView.vue";
-import Account from "@/components/Account.vue";
+import { createRouter, createWebHistory } from 'vue-router'
+import AnnotationView from '@/views/AnnotationView.vue'
+import AuthView from '@/views/AuthView.vue'
+import DashboardView from '@/views/DashboardView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/",
-      name: "home",
-      component: AnnotationView,
+      path: '/',
+      redirect: '/annotate'
     },
     {
-      path: "/auth",
-      name: "auth",
-      component: AuthView,
+      path: '/annotate',
+      name: 'annotate',
+      component: AnnotationView
     },
     {
-      path: "/account",
-      name: "acc",
-      component: Account,
+      path: '/dashboard',
+      name: 'home',
+      component: DashboardView
     },
-  ],
-});
 
-export default router;
+    {
+      path: '/auth',
+      name: 'auth',
+      component: AuthView
+    }
+  ]
+})
+
+export default router

@@ -21,7 +21,7 @@ const handleSubmit = async () => {
                 password: password.value,
             })
             if (error) throw error
-            alert('Sign up successful! Please check your email for the confirmation link.')
+            alert('Sign up successful!')
         } else {
             // Normal login with email and password
             const { error } = await supabaseClient.auth.signInWithPassword({
@@ -51,13 +51,15 @@ const toggleForm = () => {
 <template>
     <div class="auth-container">
         <div class="auth-form-container">
-            <h1 class="auth-header">{{isSignUp? "SignUp" : "SignIn"}}</h1>
+            <h1 class="auth-header">{{ isSignUp ? "SignUp" : "SignIn" }}</h1>
             <form class="auth-form" @submit.prevent="handleSubmit">
                 <input class="auth-input" required type="email" placeholder="Email" v-model="email" />
                 <input class="auth-input" required type="password" placeholder="Password" v-model="password" />
-                <input v-if="isSignUp" class="auth-input" required type="password" placeholder="Confirm Password" v-model="confirmPassword" />
+                <input v-if="isSignUp" class="auth-input" required type="password" placeholder="Confirm Password"
+                    v-model="confirmPassword" />
                 <div>
-                    <input type="submit" class="auth-button" :value="loading ? 'Loading' : (isSignUp ? 'Sign Up' : 'Sign In')" :disabled="loading" />
+                    <input type="submit" class="auth-button"
+                        :value="loading ? 'Loading' : (isSignUp ? 'Sign Up' : 'Sign In')" :disabled="loading" />
                 </div>
             </form>
             <p class="form-toggle">
