@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { supabaseClient } from '../supabase'
 import { onMounted, ref, toRefs } from 'vue'
 
 const props = defineProps(['session'])
-const { session } = toRefs(props)
+const { session } = toRefs(props) || ""
 
 const loading = ref(true)
 const username = ref('')
@@ -17,7 +17,7 @@ onMounted(() => {
 async function getProfile() {
     try {
         loading.value = true
-        const { user } = session.value
+        const { user } = session?.value || {}
 
         const { data, error, status } = await supabaseClient
             .from('profiles')
@@ -32,7 +32,7 @@ async function getProfile() {
             website.value = data.website
             avatar_url.value = data.avatar_url
         }
-    } catch (error) {
+    } catch (error: any) {
         alert(error.message)
     } finally {
         loading.value = false
@@ -42,7 +42,7 @@ async function getProfile() {
 async function updateProfile() {
     try {
         loading.value = true
-        const { user } = session.value
+        const { user } = session?.value || {}
 
         const updates = {
             id: user.id,
@@ -55,7 +55,7 @@ async function updateProfile() {
         const { error } = await supabaseClient.from('profiles').upsert(updates)
 
         if (error) throw error
-    } catch (error) {
+    } catch (error: any) {
         alert(error.message)
     } finally {
         loading.value = false
@@ -67,7 +67,7 @@ async function signOut() {
         loading.value = true
         const { error } = await supabaseClient.auth.signOut()
         if (error) throw error
-    } catch (error) {
+    } catch (error: any) {
         alert(error.message)
     } finally {
         loading.value = false
