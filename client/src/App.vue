@@ -40,8 +40,6 @@ const handleLogout = async () => {
             :class="{ 'is-active': route.path === '/dashboard' }">Dashboard</router-link>
           <router-link to="/annotate" class="navbar-item"
             :class="{ 'is-active': route.path === '/annotate' }">Annotate</router-link>
-        </div>
-        <div class="navbar-end">
           <a class="navbar-item" @click="handleLogout">Logout</a>
         </div>
       </div>
@@ -75,9 +73,14 @@ const handleLogout = async () => {
   text-decoration: none;
 }
 
+.navbar-item:hover{
+  cursor: pointer;
+}
+
 .navbar-menu {
   display: flex;
   align-items: center;
+  
 }
 
 .navbar-start,

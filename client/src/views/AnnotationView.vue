@@ -60,13 +60,17 @@ const imageUrl = ref("")
 const transcribedText = ref("")
 const translatedText = ref("")
 const userId = ref("")
+const maxAnnotatorsPerImage = 2
 
 const harmfulCategories = [
-    'Hate Speech',
-    'Violence',
     'Discrimination',
-    'Misinformation',
-    'Other'
+    'Promoting Violence',
+    'Offensive Content',
+    'Self-Inflicted Harm',
+    'Exploitation',
+    'Sexual Content',
+    'Illicit Behavior',
+    "False Information"
 ];
 
 const handleSubmit = async () => {
@@ -110,17 +114,13 @@ const handleSkip = async () => {
     })
     resetInput()
     fetchImageToAnnotate()
-
-
-    resetInput()
-    fetchImageToAnnotate()
 };
 
 const fetchImageToAnnotate = async () => {
     try {
 
         const { data, error } = await supabaseClient.rpc("get_one_meme_image", {
-            "p_max_annotations": 3,
+            "p_max_annotations": maxAnnotatorsPerImage,
             "p_user_id": userId.value
         });
         if (error) throw error;
