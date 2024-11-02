@@ -8,12 +8,7 @@
                 <div class="text-sections">
                     <div class="text-section">
                         <h3>Edit transcribed text:</h3>
-                        <textarea v-model="originalText" dir="rtl" class="editable-text"></textarea>
-                    </div>
-                    <div class="text-section">
-                        <h3>Edit translated text:</h3>
-                        <textarea v-model="translatedText" placeholder="Enter translated text here"
-                            class="translated-text"></textarea>
+                        <textarea v-model="transcribedText" dir="rtl" class="editable-text"></textarea>
                     </div>
                     <div class="harmful-section">
                         <div class="checkbox-group">
@@ -25,15 +20,6 @@
                                 <input type="checkbox" id="harmful" v-model="isHarmful" class="checkbox-input">
                                 <label for="harmful">Is Harmful</label>
                             </div>
-                        </div>
-                        <div v-if="isHarmful" class="harmful-category">
-                            <h3>Choose a category</h3>
-                            <select v-model="harmfulCategory">
-                                <option value="" disabled selected>Select harmful category</option>
-                                <option v-for="category in harmfulCategories" :key="category" :value="category">
-                                    {{ category }}
-                                </option>
-                            </select>
                         </div>
                     </div>
                     <div class="button-group">
@@ -50,42 +36,38 @@
 import { ref, onMounted } from 'vue';
 import { supabaseClient } from "../supabase"
 
-const originalText = ref('');
 const isHarmful = ref(false);
-const harmfulCategory = ref('');
 const isMeme = ref(true);
 
 const imageId = ref("")
 const imageUrl = ref("")
 const transcribedText = ref("")
-const translatedText = ref("")
 const userId = ref("")
-const maxAnnotatorsPerImage = 2
+const maxAnnotatorsPerImage = 3
 
-const harmfulCategories = [
-    'Discrimination',
-    'Promoting Violence',
-    'Offensive Content',
-    'Self-Inflicted Harm',
-    'Exploitation',
-    'Sexual Content',
-    'Illicit Behavior',
-    "False Information"
-];
+// const harmfulCategories = [
+//     'Discrimination',
+//     'Promoting Violence',
+//     'Offensive Content',
+//     'Self-Inflicted Harm',
+//     'Exploitation',
+//     'Sexual Content',
+//     'Illicit Behavior',
+//     "False Information"
+// ];
 
 const handleSubmit = async () => {
-    if (!harmfulCategory.value && isHarmful.value)
-        alert("You must choose a meme category or skip if you can't understand")
 
     const { data } = await supabaseClient.from("annotations").insert({
         image_id: imageId.value,
         is_meme: isMeme.value,
-        is_harmful: isHarmful.value,
-        class: isHarmful.value ? harmfulCategory.value : "",
         transcribed_text: transcribedText.value,
         created_by: userId.value
-
     })
+
+    const { data: data2 } = await supabaseClient.from("meme_images").update({
+        corrected_transcribed_text: transcribedText.value,
+    }).eq('id', imageId.value)
 
     resetInput()
     fetchImageToAnnotate()
@@ -94,14 +76,11 @@ const handleSubmit = async () => {
 };
 
 const resetInput = () => {
-    originalText.value = '';
     isHarmful.value = false;
-    harmfulCategory.value = '';
     isMeme.value = true;
     imageId.value = ''
     imageUrl.value = ''
     transcribedText.value = ''
-    translatedText.value = ''
 }
 
 const handleSkip = async () => {
@@ -120,16 +99,15 @@ const fetchImageToAnnotate = async () => {
     try {
 
         const { data, error } = await supabaseClient.rpc("get_one_meme_image", {
+            "p_user_id": userId.value,
             "p_max_annotations": maxAnnotatorsPerImage,
-            "p_user_id": userId.value
         });
+        console.log(data)
         if (error) throw error;
 
         if (data && data.length > 0) {
             imageUrl.value = data[0]['image_url'];
-            transcribedText.value = data[0]['ocr_text'];
-            originalText.value = data[0]['ocr_text'] || originalText.value;
-            translatedText.value = data[0]['translated_text'] || '';
+            transcribedText.value = data[0]['corrected_transcribed_text'];
             imageId.value = data[0]['id'] || ''
         }
     } catch (error) {
@@ -285,7 +263,7 @@ main {
 
 .meme {
     max-width: 100%;
-    max-height: 300px;
+    max-height: 500px;
     object-fit: contain;
     cursor: pointer;
     transition: transform 0.3s ease;
