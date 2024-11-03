@@ -61,6 +61,7 @@ const handleSubmit = async () => {
     const { data } = await supabaseClient.from("annotations").insert({
         image_id: imageId.value,
         is_meme: isMeme.value,
+        is_harmful: isHarmful.value,
         transcribed_text: transcribedText.value,
         created_by: userId.value
     })
